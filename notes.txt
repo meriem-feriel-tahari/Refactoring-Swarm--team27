@@ -1,0 +1,6 @@
+inside the graph.py im going to create nodes and edges 
+inside state.py it's going to be just a stateworkflow that can be pased between agnets
+////
+after getting arguments from cli i need to parcour every file recursivly 
+so when i receive the file i will read it and pass its content to the prompt
+ and keep it in the flow state so ican pass it from agent to other agent 
