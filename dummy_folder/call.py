@@ -41,7 +41,8 @@
 # print(response.text)
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai
+# import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Load .env so we get GEMINI_API_KEY
 load_dotenv()
@@ -54,10 +55,17 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # Instantiate model
-model = genai.GenerativeModel("gemini-2.5-flash")
+# model = genai.GenerativeModel("gemini-2.5-flash")
 
 # Send a test prompt
-response = model.generate_content("heloo gemini introduce ai briefly")
+# response = model.generate_content("heloo gemini introduce ai briefly")
 
+
+
+llm=ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            api_key=os.getenv("GOOGLE_API_KEY"),
+        )
+response =llm.invoke("Hey can u explain how to use ur Api")
 print("=== MODEL RESPONSE ===")
-print(response.text)
+print(response.content)
