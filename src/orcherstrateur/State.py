@@ -5,6 +5,7 @@ class state_flow:
     #file:str
     path:str
     auditor_output:str
+    fixer_output:str
     iter:int
     max_iter:int  
     valid_judge:bool  
