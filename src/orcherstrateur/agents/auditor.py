@@ -6,7 +6,7 @@ load_dotenv()
 def read(filepath):
     try :
         with open('filepath','r') as f:
-            content=f.reas()
+            content=f.read()
         print(content)
         return content
     except: FileNotFoundError
@@ -15,10 +15,10 @@ def read(filepath):
 class AuditorAgent:
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",  # verify this
+            model="gemini-2.5-flash",  
             api_key=os.getenv("GOOGLE_API_KEY"),
         )
-        self.system_prompt=read("prompts/auditor.txt")
+        # self.system_prompt=read("prompts/auditor.txt")
 
     def analyse(self, file_content: str):
         prompt="""ROLE :
