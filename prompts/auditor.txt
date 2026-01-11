@@ -1,27 +1,4 @@
-import os
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-load_dotenv()
-def read(filepath):
-    try :
-        with open('filepath','r') as f:
-            content=f.reas()
-        print(content)
-        return content
-    except: FileNotFoundError
-    
-    print("not found")        
-class AuditorAgent:
-    def __init__(self):
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",  # verify this
-            api_key=os.getenv("GOOGLE_API_KEY"),
-        )
-        self.system_prompt=read("prompts/auditor.txt")
-
-    def analyse(self, file_content: str):
-        prompt="""ROLE :
+ROLE :
 You are the AUDITOR agent in the "Refactoring Swarm" System 
 
 
@@ -44,7 +21,7 @@ Inputs :
 
 
 Outputs: 
-JSON files in the forme of 
+JSON files in t forme of 
 {
   "files_analyzed": [
     {
@@ -87,20 +64,3 @@ If information is missing, Then DO NOT hallucinate AND Return empty arrays and s
 
 
 
-"""
-                # here is the analysis output:{}
-
-        orchestre_additional_prompt= f"""
-        here is the code :def(A,b)return a+B;
-        here is the path of the file :prompts/auditor.txt
-        """
-        prompt+=orchestre_additional_prompt
-
-        response = self.llm.invoke(prompt)
-        # add the log 
-        print(response.content)
-
-
-# Example usage
-agent = AuditorAgent()
-agent.analyse("def add(a,b): return a+b")
