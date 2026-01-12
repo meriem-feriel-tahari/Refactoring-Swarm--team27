@@ -1,11 +1,24 @@
 [
-  {
-    "id": "9e82e9b0-9b43-4a78-af43-d5d5ef848a2f",
-    "timestamp": "2025-12-26T01:26:41.177789",
-    "agent": "System",
-    "model": "unknown",
-    "action": "STARTUP",
-    "details": "Target: ./sandbox",
-    "status": "INFO"
-  }
+    {
+        "id": "9e82e9b0-9b43-4a78-af43-d5d5ef848a2f",
+        "timestamp": "2025-12-26T01:26:41.177789",
+        "agent": "System",
+        "model": "unknown",
+        "action": "STARTUP",
+        "details": "Target: ./sandbox",
+        "status": "INFO"
+    },
+    {
+        "id": "0b8a784b-55fb-437f-8081-8ccdc7fc569b",
+        "timestamp": "2026-01-12T02:52:21.842523",
+        "agent": "Auditor",
+        "model": "gemini-2.0-flash",
+        "action": "CODE_ANALYSIS",
+        "details": {
+            "input_prompt": "Analyze this code for bugs",
+            "output_response": "Found 2 syntax errors",
+            "file": "test.py"
+        },
+        "status": "SUCCESS"
+    }
 ]

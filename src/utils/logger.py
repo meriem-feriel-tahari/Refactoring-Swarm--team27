@@ -15,6 +15,7 @@ class ActionType(str, Enum):
     GENERATION = "CODE_GEN"     # Création de nouveau code/tests/docs
     DEBUG = "DEBUG"             # Analyse d'erreurs d'exécution
     FIX = "FIX"                 # Application de correctifs
+    SYSTEM = "SYSTEM_INFO"      # ✅ ADDED: For system messages like startup
 
 def log_experiment(agent_name: str, model_used: str, action: ActionType, details: dict, status: str):
     """
@@ -34,17 +35,36 @@ def log_experiment(agent_name: str, model_used: str, action: ActionType, details
     # --- 1. VALIDATION DU TYPE D'ACTION ---
     # Permet d'accepter soit l'objet Enum, soit la chaîne de caractères correspondante
     valid_actions = [a.value for a in ActionType]
+    
+    # ✅ FIXED: Accept both Enum and string versions of valid actions
     if isinstance(action, ActionType):
         action_str = action.value
-    elif action in valid_actions:
+    elif isinstance(action, str) and action in valid_actions:
         action_str = action
+    elif isinstance(action, str):
+        # ✅ FIXED: Also accept the string name of the enum (e.g., "ANALYSIS" for ActionType.ANALYSIS)
+        try:
+            # Check if it's the enum name (not value)
+            action_enum = ActionType[action]
+            action_str = action_enum.value
+        except KeyError:
+            raise ValueError(
+                f"❌ Action invalide : '{action}'. "
+                f"Utilisez la classe ActionType (ex: ActionType.FIX) ou l'une de ces valeurs: {valid_actions}"
+            )
     else:
-        raise ValueError(f"❌ Action invalide : '{action}'. Utilisez la classe ActionType (ex: ActionType.FIX).")
+        raise ValueError(
+            f"❌ Action invalide : '{action}'. "
+            f"Utilisez la classe ActionType (ex: ActionType.FIX) ou l'une de ces valeurs: {valid_actions}"
+        )
 
     # --- 2. VALIDATION STRICTE DES DONNÉES (Prompts) ---
     # Pour l'analyse scientifique, nous avons absolument besoin du prompt et de la réponse
     # pour les actions impliquant une interaction majeure avec le code.
-    if action_str in [ActionType.ANALYSIS, ActionType.GENERATION, ActionType.DEBUG, ActionType.FIX]:
+    
+    # ✅ FIXED: Only require prompts for LLM interactions, not system messages
+    if action_str in [ActionType.ANALYSIS.value, ActionType.GENERATION.value, 
+                      ActionType.DEBUG.value, ActionType.FIX.value]:
         required_keys = ["input_prompt", "output_response"]
         missing_keys = [key for key in required_keys if key not in details]
         
@@ -52,8 +72,14 @@ def log_experiment(agent_name: str, model_used: str, action: ActionType, details
             raise ValueError(
                 f"❌ Erreur de Logging (Agent: {agent_name}) : "
                 f"Les champs {missing_keys} sont manquants dans le dictionnaire 'details'. "
-                f"Ils sont OBLIGATOIRES pour valider le TP."
+                f"Ils sont OBLIGATOIRES pour les actions d'analyse/génération/débogage/correction."
             )
+    
+    # ✅ ADDED: For SYSTEM actions, we don't require prompts
+    elif action_str == ActionType.SYSTEM.value:
+        # System messages don't need prompts, but ensure details is a dict
+        if not isinstance(details, dict):
+            details = {"message": str(details)} if details else {}
 
     # --- 3. PRÉPARATION DE L'ENTRÉE ---
     # Création du dossier logs s'il n'existe pas
@@ -75,7 +101,7 @@ def log_experiment(agent_name: str, model_used: str, action: ActionType, details
         try:
             with open(LOG_FILE, 'r', encoding='utf-8') as f:
                 content = f.read().strip()
-                if content: # Vérifie que le fichier n'est pas juste vide
+                if content:  # Vérifie que le fichier n'est pas juste vide
                     data = json.loads(content)
         except json.JSONDecodeError:
             # Si le fichier est corrompu, on repart à zéro (ou on pourrait sauvegarder un backup)
@@ -87,3 +113,20 @@ def log_experiment(agent_name: str, model_used: str, action: ActionType, details
     # Écriture
     with open(LOG_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
+# ✅ ADDED: Helper function for backward compatibility
+def log_system_message(message: str, status: str = "INFO", **extra_details):
+    """
+    Helper pour les messages système (comme le démarrage).
+    Compatible avec l'ancien format du main.py du professeur.
+    """
+    details = {"message": message}
+    details.update(extra_details)
+    
+    return log_experiment(
+        agent_name="System",
+        model_used="unknown",
+        action=ActionType.SYSTEM,
+        details=details,
+        status=status
+    )

@@ -2,7 +2,7 @@ import argparse
 import sys
 import os
 from dotenv import load_dotenv
-from src.utils.logger import log_experiment
+from src.utils.logger import log_experiment, ActionType  # ✅ Add ActionType import
 
 load_dotenv()
 
@@ -16,7 +16,20 @@ def main():
         sys.exit(1)
 
     print(f"🚀 DEMARRAGE SUR : {args.target_dir}")
-    log_experiment("System", "STARTUP", f"Target: {args.target_dir}", "INFO")
+    
+    # ✅ FIXED: Correct logger call with ALL required arguments
+    log_experiment(
+        agent_name="System",
+        model_used="unknown",
+        action=ActionType.ANALYSIS,  # Must be from ActionType enum
+        details={
+            "input_prompt": "System startup",  # ✅ REQUIRED by logger
+            "output_response": f"Starting analysis on {args.target_dir}",  # ✅ REQUIRED
+            "target_directory": args.target_dir
+        },
+        status="INFO"  # or "SUCCESS"
+    )
+    
     print("✅ MISSION_COMPLETE")
 
 if __name__ == "__main__":
