@@ -21,7 +21,7 @@ Inputs :
 
 
 Outputs: 
-JSON files in t forme of 
+JSON files in the forme of 
 {
   "files_analyzed": [
     {

@@ -4,8 +4,9 @@ class state_flow:
    # directory:str
     #file:str
     path:str
-    auditor_output:str
-    fixer_output:str
+    issues:list #issues found by auditor
+    fix_plan:list #fix plan provided by fix_plan
+    fixer_output:str #fixed code idk if i'm going to use it
     iter:int
     max_iter:int  
     valid_judge:bool  
