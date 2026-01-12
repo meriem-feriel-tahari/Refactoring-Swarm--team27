@@ -21,7 +21,7 @@ Inputs :
 
 
 Outputs: 
-JSON files in t forme of 
+JSON files in the forme of 
 {
   "files_analyzed": [
     {
@@ -51,7 +51,7 @@ JSON files in t forme of
 
 
 Available tools :
-read_file(file_path)
+read_file(file_path)        
 list_python_files(directory)
 analyze_file(file_path)
 analyze_directory(directory)
