@@ -48,11 +48,11 @@ def auditor_node(state: state_flow,filepath) -> state_flow:
     all_issues.extend(audit_result.get("issues", []))
     all_plans.extend(audit_result.get("refactoring_plan", []))
     
-    # ✅ WRITE to state (this is how you pass data to Fixer!)
+   
     state["audit_results"] = audit_result.content["refactoring_plan"]
     
-    print(f"✅ [AUDITOR] Found {len(all_issues)} issues")
-    print(f"✅ [AUDITOR] Created {len(all_plans)} step plan")
+    print(f"[AUDITOR] Found {len(all_issues)} issues")
+    print(f" [AUDITOR] Created {len(all_plans)} step plan")
     
   
     return state
