@@ -1,8 +1,10 @@
 from pylint import run_pylint
 from orcherstrateur.State import state_flow
-from orcherstrateur.agents.auditor import AuditorAgent
+from src.orcherstrateur.agents.auditor import AuditorAgent
 from orcherstrateur.agents.fixer import FixerAgent
+from src.orcherstrateur.agents.judge import JudgeAgent
 from src.tools.file_tools import read_file
+from src.utils.logger import ActionType, log_experiment
 #here i will generate the graph 
 #i will have audit node fix node judge node
 '''
@@ -43,7 +45,17 @@ def auditor_node(state: state_flow,filepath) -> state_flow:
     content = read_file(filepath)
     pylint_report = run_pylint(filepath)
     audit_result = AuditorAgent.analyze(content, filepath, pylint_report)
-        
+    log_experiment (
+agent_name = "auditor_agent",
+model_used = "gemini-2.5-flash",
+action = ActionType.ANALYSIS, 
+details = {
+"file_analyzed": filepath,
+"input_prompt":"You're a Python expert. Analyze this code...", # MANDATORY
+"output_response":f"{audit_result.content}",
+"issues_found": len(all_issues)
+},
+status="SUCCESS" )
 
     all_issues.extend(audit_result.get("issues", []))
     all_plans.extend(audit_result.get("refactoring_plan", []))
@@ -60,16 +72,30 @@ def fixer_node(state:state_flow)->state_flow:
     issues=get_issues(state["issues"])
     plan=get_study_plan(state["refactoring_plan"])
     fixer=FixerAgent().fix()
+    log_experiment (
+agent_name = "Auditor_Agent",
+model_used = "gemini-2.5-flash",
+action = ActionType.FIX, # 
+details = {
+"file_analyzed": "messy_code.py",
+"input_prompt":"You're a Python expert. Analyze this code...", # MANDATORY
+"output_response":fixer.content,
+"issues_found": 0
+},
+status="SUCCESS" )
     return state
   
  #i add the auditor output to the state and return it 
   
 def judge_node(state:state_flow)->state_flow:
+    judge_response=JudgeAgent.judge()
+    """if correct i will pass the value to the state and then do state[fixed]==fouad ?
+    if we are at max i do backup else i continue"""
  #and call the judge
  #i add the auditor output to the state and return it
  #if the output of the judge node is valid then we move to next file or  we are done
  #if the output is not valid we need to check whetther we attended mx iteration or we can send again to fixer  
-  return state
+    return state
 #////////////////////////////defining edges////////////
 
 from langgraph.graph import StateGraph

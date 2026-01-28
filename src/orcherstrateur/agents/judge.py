@@ -60,7 +60,7 @@ print(f"{response.content} \n hello baby")
 
 # response = LLM result
 try:
-    print("inside try")
+    print("inside try \n")
     content = json.loads(response.content)
     print(content)
 except json.JSONDecodeError as e:

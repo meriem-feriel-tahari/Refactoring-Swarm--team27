@@ -16,7 +16,7 @@ class SecurityError(Exception):
 class FileTools:
     """Tools for safe file operations within sandbox"""
     
-    def __init__(self, sandbox_path: str = "./sandbox"):
+    def __init__(self, sandbox_path: str = "./sandbox",prompts_path:str ="./prompts"):
         """
         Initialize with sandbox directory
         
@@ -25,7 +25,9 @@ class FileTools:
         """
         self.sandbox_path = Path(sandbox_path).resolve()
         self.sandbox_path.mkdir(parents=True, exist_ok=True)
-        print(f"🔒 FileTools initialized with sandbox: {self.sandbox_path}")
+        self.prompts_path = Path(prompts_path).resolve()
+        self.prompts_path.mkdir(parents=True, exist_ok=True)
+      #  print(f"FileTools initialized with sandbox: {self.sandbox_path}")
     
     def _is_safe_path(self, file_path: str) -> bool:
         """
@@ -39,7 +41,7 @@ class FileTools:
         """
         try:
             full_path = Path(file_path).resolve()
-            return str(full_path).startswith(str(self.sandbox_path))
+            return str(full_path).startswith(str(self.sandbox_path)) or str(full_path).startswith(str(self.prompts_path))
         except Exception as e:
             print(f"⚠️ Path validation error: {e}")
             return False
@@ -63,16 +65,16 @@ class FileTools:
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            print(f"✅ Read file: {file_path} ({len(content)} chars)")
+            print(f" Read file: {file_path} ({len(content)} chars)")
             return content
         except FileNotFoundError:
-            print(f"❌ File not found: {file_path}")
+            print(f" File not found: {file_path}")
             return None
         except UnicodeDecodeError:
-            print(f"❌ Cannot read file (encoding issue): {file_path}")
+            print(f" Cannot read file (encoding issue): {file_path}")
             return None
         except Exception as e:
-            print(f"❌ Error reading file: {e}")
+            print(f" Error reading file: {e}")
             return None
     
     def write_file(self, file_path: str, content: str) -> bool:
@@ -90,7 +92,7 @@ class FileTools:
             SecurityError: If path is outside sandbox
         """
         if not self._is_safe_path(file_path):
-            raise SecurityError(f"🚫 Access denied: {file_path} is outside sandbox")
+            raise SecurityError(f" Access denied: {file_path} is outside sandbox")
         
         try:
             print("hello from write file")
@@ -100,10 +102,10 @@ class FileTools:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
             
-            print(f"✅ Wrote file: {file_path} ({len(content)} chars)")
+            print(f" Wrote file: {file_path} ({len(content)} chars)")
             return True
         except Exception as e:
-            print(f"❌ Error writing file: {e}")
+            print(f" Error writing file: {e}")
             return False
     
     def list_python_files(self, directory: str) -> List[str]:
@@ -120,7 +122,7 @@ class FileTools:
             SecurityError: If directory is outside sandbox
         """
         if not self._is_safe_path(directory):
-            raise SecurityError(f"🚫 Access denied: {directory} is outside sandbox")
+            raise SecurityError(f" Access denied: {directory} is outside sandbox")
         
         python_files = []
         try:
@@ -130,10 +132,10 @@ class FileTools:
                         full_path = os.path.join(root, file)
                         python_files.append(full_path)
             
-            print(f"📁 Found {len(python_files)} Python files in {directory}")
+            print(f" Found {len(python_files)} Python files in {directory}")
             return python_files
         except Exception as e:
-            print(f"❌ Error listing files: {e}")
+            print(f" Error listing files: {e}")
             return []
     
     def backup_file(self, file_path: str) -> Optional[str]:
@@ -150,7 +152,7 @@ class FileTools:
             SecurityError: If path is outside sandbox
         """
         if not self._is_safe_path(file_path):
-            raise SecurityError(f"🚫 Access denied: {file_path} is outside sandbox")
+            raise SecurityError(f" Access denied: {file_path} is outside sandbox")
         
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -158,11 +160,11 @@ class FileTools:
             
             content = self.read_file(file_path)
             if content and self.write_file(backup_path, content):
-                print(f"💾 Backup created: {backup_path}")
+                print(f" Backup created: {backup_path}")
                 return backup_path
             return None
         except Exception as e:
-            print(f"❌ Error creating backup: {e}")
+            print(f"Error creating backup: {e}")
             return None
     
     def restore_backup(self, backup_path: str, original_path: str) -> bool:
