@@ -13,20 +13,21 @@ class AuditorAgent:
         self.fl=FileTools()
         self.system_prompt=self.fl.read_file("prompts/auditor.txt")
 
-    def analyse(self):
+    def analyze(self,content,pylint_report,filepath):
        
         prompt=self.system_prompt
         
         
         orchestre_additional_prompt= f"""
-         here is the code :{self.fl.read_file("sandbox/code.py")};
-
-        here is the path of the file :sandbox/code.py
+         the code :\n{content};\n
+        
+         the file : {filepath};\n
+         the pylint_report:\n {pylint_report}\n
         """
         prompt+=orchestre_additional_prompt
 
         response = self.llm.invoke(prompt)
-        # add the log 
+        
         print(response.content)
         return response.content
 

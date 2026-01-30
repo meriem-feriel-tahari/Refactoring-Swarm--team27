@@ -39,7 +39,7 @@ class WorkflowState(TypedDict):
         error_logs: Test error messages to guide the next fix iteration
     """
     target_dir: str
-    files_to_process: List[str]
+    files_to_process:List[str]
     audit_results: Optional[Dict[str, Dict]]
     fixed_files: List[str]
     test_results: Optional[Dict]
@@ -612,7 +612,8 @@ def build_workflow() -> StateGraph:
     workflow.add_node("judge", judge_node)
     
     # Define the flow
-    workflow.set_entry_point("auditor")  # Always start with auditor
+    workflow.set_entry_point("auditor")  
+    # Always start with auditor
     
     # Linear flow: Auditor → Fixer → Judge
     workflow.add_edge("auditor", "fixer")

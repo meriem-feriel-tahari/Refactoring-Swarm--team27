@@ -18,7 +18,7 @@ Constraints :
 
 
 Inputs :
-You will receive a JSON object containing the field "test_results", produced by the run_tests() tool.
+You will receive a JSON object containing the field "test_results", produced by the run_pytest() tool.
 
 
 Outputs :
@@ -41,7 +41,7 @@ JSON file in the form of
 
 
 Available tools :
-run_tests(directory)
+run_pytest(directory)
 
 
 Decision Rules :

@@ -81,8 +81,8 @@ class AnalysisTools:
                 'status': 'success'
             }
             
-            print(f"✅ Pylint analysis complete: Score {score}/{max_score} ({analysis_result['percentage']}%)")
-            print(f"   Issues found: {len(issues)} (Errors: {len(categorized['errors'])}, Warnings: {len(categorized['warnings'])})")
+            print(f"Pylint analysis complete: Score {score}/{max_score} ({analysis_result['percentage']}%)")
+            print(f" Issues found: {len(issues)} (Errors: {len(categorized['errors'])}, Warnings: {len(categorized['warnings'])})")
             
             return analysis_result
             
