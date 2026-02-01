@@ -45,7 +45,7 @@ class FileTools:
         except Exception as e:
             print(f"⚠️ Path validation error: {e}")
             return False
-    
+    @staticmethod
     def read_file(self, file_path: str) -> Optional[str]:
         """
         Safely read a file from sandbox
@@ -76,7 +76,7 @@ class FileTools:
         except Exception as e:
             print(f" Error reading file: {e}")
             return None
-    
+    @staticmethod 
     def write_file(self, file_path: str, content: str) -> bool:
         """
         Safely write content to a file in sandbox
@@ -95,7 +95,7 @@ class FileTools:
             raise SecurityError(f" Access denied: {file_path} is outside sandbox")
         
         try:
-            print("hello from write file")
+            print(f"hello from write file \n")
             # Create parent directories if needed
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
             
@@ -107,7 +107,7 @@ class FileTools:
         except Exception as e:
             print(f" Error writing file: {e}")
             return False
-    
+    @staticmethod
     def list_python_files(self, directory: str) -> List[str]:
         """
         List all Python files in a directory
@@ -137,7 +137,7 @@ class FileTools:
         except Exception as e:
             print(f" Error listing files: {e}")
             return []
-    
+    @staticmethod
     def backup_file(self, file_path: str) -> Optional[str]:
         """
         Create a backup of a file before modification
@@ -166,7 +166,7 @@ class FileTools:
         except Exception as e:
             print(f"Error creating backup: {e}")
             return None
-    
+    @staticmethod
     def restore_backup(self, backup_path: str, original_path: str) -> bool:
         """
         Restore a file from backup
@@ -186,7 +186,7 @@ class FileTools:
         except Exception as e:
             print(f"❌ Error restoring backup: {e}")
             return False
-    
+    @staticmethod
     def delete_file(self, file_path: str) -> bool:
         """
         Safely delete a file

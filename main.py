@@ -4,8 +4,9 @@ import os
 from dotenv import load_dotenv
 
 from src.orcherstrateur.State import state_flow
-from src.utils.logger import log_experiment
+from src.utils.logger import ActionType, log_experiment
 from src.orcherstrateur.graph import app
+from src.tools.file_tools import FileTools
 # from src.tools.file_tools import FileTools
 # from src.orcherstrateur.agents.auditor import AuditorAgent
 # from src.orcherstrateur.agents.fixer import FixerAgent
@@ -13,18 +14,6 @@ from src.orcherstrateur.graph import app
 load_dotenv()
 import os
 def main():
-    # fl=FileTools()
-    # # ici il faut nmedlo path here im just trying
-    # auditor=AuditorAgent()
-    # refplan= auditor.analyse()
-    # backed_path=fl.backup_file("sandbox/code.py")
-    # fixer=FixerAgent()
-    # fixedcode=fixer.fix(refplan,originalcode=fl.read_file("sandbox/code.py"))
-    # print(fixedcode)
-    # newfile=fl.write_file("sandbox/code.py",fixedcode)
-    #now im going to give the outpt to the fixer and the fixer will create a file and before that we nedd to backup the current file
-    #so that we wont lose it 
-    
     parser = argparse.ArgumentParser()
     parser.add_argument("--target_dir", type=str, required=True)
     args = parser.parse_args()
@@ -34,11 +23,27 @@ def main():
         sys.exit(1)
 
     print(f"🚀 DEMARRAGE SUR : {args.target_dir}")
-    log_experiment("System", "STARTUP", f"Target: {args.target_dir}", "INFO")
-    initstate=state_flow(file_path="sandbox/code.py")
+   
+    log_experiment("System","gemini-2.5-flash", ActionType.SYSTEM, f"Target: {args.target_dir}", "INFO")
+    initstate=state_flow()
+    fl=FileTools()
+    all_files=fl.list_python_files(fl,"sandbox/")
+    print(all_files)
+    for file in all_files:
+        initstate = {
+        "file_path": str(file),
+        "issues": [],
+        "fix_plan": None,
+        "test_results": None,
+        "iteration": 0,
+        "max_iterations": 5,  
+        "valid_judge": False,
+        "backup_path": None
+    }
     finalstate=app.invoke(initstate)
-    
+        
     print("✅ MISSION_COMPLETE")
 
 if __name__ == "__main__":
-    main()
+    main() 
+    pass

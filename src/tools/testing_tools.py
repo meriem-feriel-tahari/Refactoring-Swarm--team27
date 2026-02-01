@@ -20,7 +20,7 @@ class TestingTools:
         """
         self.sandbox_path = Path(sandbox_path).resolve()
         print(f"🧪 TestingTools initialized")
-    
+    @staticmethod
     def run_pytest(self, target_path: str, test_file: Optional[str] = None, 
                    timeout: int = 60, verbose: bool = True) -> Dict:
         """
@@ -33,7 +33,7 @@ class TestingTools:
             verbose: Show detailed output
             
         Returns:
-            Dictionary with test results:
+            Dictionary with test_results:
             {
                 'passed': int,
                 'failed': int,

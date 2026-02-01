@@ -11,7 +11,7 @@ class AuditorAgent:
             api_key=os.getenv("GOOGLE_API_KEY"),
         )
         self.fl=FileTools()
-        self.system_prompt=self.fl.read_file("prompts/auditor.txt")
+        self.system_prompt=self.fl.read_file(self.fl,"prompts/auditor.txt")
 
     def analyze(self,content,pylint_report,filepath):
        

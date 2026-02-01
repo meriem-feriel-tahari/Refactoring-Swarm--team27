@@ -21,7 +21,7 @@ class AnalysisTools:
         """
         self.sandbox_path = Path(sandbox_path).resolve()
         print(f"🔍 AnalysisTools initialized")
-    
+    @staticmethod
     def run_pylint(self, file_path: str, timeout: int = 30) -> Dict:
         """
         Run pylint on a Python file

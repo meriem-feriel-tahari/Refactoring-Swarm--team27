@@ -1,12 +1,12 @@
-from tkinter import END
+import json
 from pylint import run_pylint
 from .State import state_flow
-from .agents.auditor import AuditorAgent
+from .agents.auditor import AuditorAgent 
 from .agents.fixer import FixerAgent
 from .agents.judge import JudgeAgent
-from src.tools.file_tools import read_file
 from src.utils.logger import ActionType, log_experiment
 from src.tools.file_tools import FileTools
+from src.tools.testing_tools import TestingTools
 from src.tools.analysis_tools import AnalysisTools
 #here i will generate the graph 
 #i will have audit node fix node judge node
@@ -17,6 +17,12 @@ so that audit yroh le fixer apr fixer lel test and if there is error i will
 go to fixer again with the output of the judge that can be as and input to the fixer 
 
 '''
+fl=FileTools()
+fa=AnalysisTools()
+ft=TestingTools()
+auditor=AuditorAgent ()
+fixer=FixerAgent()
+judge_agent=JudgeAgent()
 def get_issues(issues: list) -> str:
     res = []
     for i, item in enumerate(issues, start=1):
@@ -37,25 +43,22 @@ def get_study_plan(study_plan:list)->str:
 # i will use those func in order to get the issues and study plan from state passsed to fixer node
 #to pass it into the prompt of the fixer    
     
-def auditor_node(state: state_flow,filepath) -> state_flow:
-   
-    
-    # Collect results from all files
-    # all_issues = []
-    # all_plans = []
-    
-    fl=FileTools()
-    analysis=AnalysisTools()
-    content = read_file(filepath)
-    pylint_report = analysis.run_pylint(filepath)
-    audit_result = AuditorAgent.analyze(content, filepath, pylint_report,filepath)
+def auditor_node(state: state_flow) -> state_flow:
+    path=state["file_path"]
+    content = fl.read_file(fl,path)
+    pylint_report = fa.run_pylint(fa,state["file_path"])
+    audit_result = auditor .analyze(content,pylint_report,state["file_path"])
+    # if isinstance(audit_result, str):
+    #     parsed_result = json.loads(audit_result)
+    # else:
+    #     parsed_result = audit_result
     log_experiment (
 agent_name = "auditor",
 model_used = "gemini-2.5-flash",
 action = ActionType.ANALYSIS, 
 details = {
-"file_analyzed": filepath,
-"input_prompt":fl.read_file("prompts/auditor.txt"), # MANDATORY
+"file_analyzed": state["file_path"],
+"input_prompt":fl.read_file(fl,"prompts/auditor.txt"), # MANDATORY
 "output_response":f"{audit_result}",
 # "issues_found": len(all_issues)
 },
@@ -65,45 +68,49 @@ status="SUCCESS" )
     # all_plans.extend(audit_result.get("refactoring_plan", []))
     
    
-    state["fix_plan"] = audit_result.content["refactoring_plan"]
-    state["issues"] = audit_result.content["issues"]
+    state["fix_plan"] = audit_result
+    state["issues"] = audit_result
     
-    # print(f"[AUDITOR] Found {len(all_issues)} issues")
-    # print(f" [AUDITOR] Created {len(all_plans)} step plan")
+    
     
   
     return state
 def fixer_node(state:state_flow)->state_flow:
     #issues=gestate["issues"])
-    plan=state["refactoring_plan"]
-    origin_code=FileTools.read_file(state["file_path"])
-    fixer=FixerAgent.fix(plan,origin_code,state["file_path"])
+    plan=state["fix_plan"]
+    origin_code=fl.read_file(fl,state["file_path"])
+    fixer_response=fixer.fix(plan,origin_code,state["file_path"])
     log_experiment(
 agent_name = "Auditor_Agent",
 model_used = "gemini-2.5-flash",
 action = ActionType.FIX, 
 details = {
 "file_analyzed": state["file_path"],
-"input_prompt":FileTools.read_file("prompts/fixer.txt"),
-"output_response":fixer.content,
+"input_prompt":fl.read_file(fl,"prompts/fixer.txt"),
+"output_response":fixer_response,
 },
 status="SUCCESS" )
+    backup_path= fl.backup_file(fl,state["file_path"])
+    state["backup_path"]=backup_path
+    fl.write_file(fl,state["file_path"],fixer_response["fixed_code"])
     return state
   
  #i add the auditor output to the state and return it 
   
 def judge_node(state:state_flow)->state_flow:
-    judge_response=JudgeAgent.judge()
-    """if correct i will pass the value to the state and then do state[fixed]==fouad ?
-    if we are at max i do backup else i continue"""
- #and call the judge
- #i add the auditor output to the state and return it
- #if the output of the judge node is valid then we move to next file or  we are done
- #if the output is not valid we need to check whetther we attended mx iteration or we can send again to fixer  
+    current_code=fl.read_file(fl,state["file_path"])
+    judge_response=judge_agent.judge(current_code)
+    test_path=f"""sandbox/{judge_response["test_file_name"]}"""
+    fl.write_file(fl,test_path,judge_response["test_code"])
+    pytest_output=ft.run_pytest(ft,".",test_path)
+    state["test_results"]=pytest_output
     return state
-#////////////////////////////defining edges////////////
+def end_node(state):
+    
+    return state
+#////////////////////defining edges////////////
 
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph,END
 def should_continue(state: state_flow) -> str:
     """
     Routing function: Decide whether to continue iterating or stop.
@@ -113,42 +120,48 @@ def should_continue(state: state_flow) -> str:
         "fixer": Loop back to fixer for another iteration
     """
     # Success case: tests passed!
-    if state["test_results"]["passed"]:
-        # print(f"\n{'='*60}")
+    if state["test_results"]["success"]:
         print(f"SUCCESS: Tests passed! Stopping workflow.")
-        # print(f"{'='*60}")
         return "end"
     
     # Failure case: reached max iterations
     elif state["iteration"] >= state["max_iterations"]:
-        # print(f"\n{'='*60}")
         print(f"Max iterations ({state['max_iterations']}) reached.")
         print(f"   Stopping workflow with failing tests.")
-        # print(f"{'='*60}")
         return "end"
     
     # Retry case: go back to fixer
     else:
-        # print(f"\n{'='*60}")
-        print(f"Tests failed. Retrying with error feedback...")
+        print(f"Tests failed. Retrying ...")
         print(f"   Iteration {state['iteration']}/{state['max_iterations']}")
-        # print(f"{'='*60}")
         return "fixer"
 
-def build_workflow() -> StateGraph:
 
- graph=StateGraph(state_flow)
- graph.add_node("auditor",auditor_node)
- graph.add_node("fixer",fixer_node)
-#  graph.add_node("judge",judge_node)
- graph.add_edge("auditor","fixer")
-#  graph.add_edge("fixer","judge")
-#i still need to add conditional
-#  graph.add_conditional_edges("judge",should_continue,{
-#     "fixer":"fixer",
-#     "end":END
-# }
-                            # ) 
- graph.set_entry_point("auditor")
- return graph.compile()
+
+def build_workflow() -> StateGraph:
+    graph = StateGraph(state_flow)
+
+    # Ajouter tous les nœuds
+    graph.add_node("auditor", auditor_node)
+    graph.add_node("fixer", fixer_node)
+    graph.add_node("judge", judge_node)
+    # graph.add_node("end", end_node)
+
+    # Arêtes simples
+    graph.add_edge("auditor", "fixer")
+    graph.add_edge("fixer", "judge")
+    # graph.add_edge("judge", "end")
+
+    # Arêtes conditionnelles
+    graph.add_conditional_edges("judge", should_continue, {
+        "fixer": "fixer",
+        "end": END
+    })
+
+    # Point d'entrée
+    graph.set_entry_point("auditor")
+
+    return graph.compile()
+
+
 app=build_workflow()
