@@ -15,10 +15,11 @@ class JudgeAgent:
         fl=FileTools()
         self.prompt=fl.read_file(fl,"prompts/judgee.txt")
 
-    def judge(self,current_code):
+    def judge(self,current_code,filename):
         prompt=self.prompt
         prompt+=f"""
-        here is the current code to test:\n{current_code}
+        The current code to test:\n{current_code}\n
+        file name:{filename}
         """
         # test_content=prompt["test_code"]
         

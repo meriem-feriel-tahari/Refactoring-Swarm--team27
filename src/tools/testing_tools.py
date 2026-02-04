@@ -20,7 +20,7 @@ class TestingTools:
         """
         self.sandbox_path = Path(sandbox_path).resolve()
         print(f"🧪 TestingTools initialized")
-    @staticmethod
+    
     def run_pytest(self, target_path: str, test_file: Optional[str] = None, 
                    timeout: int = 60, verbose: bool = True) -> Dict:
         """
@@ -33,7 +33,7 @@ class TestingTools:
             verbose: Show detailed output
             
         Returns:
-            Dictionary with test_results:
+            Dictionary with test results:
             {
                 'passed': int,
                 'failed': int,
@@ -66,6 +66,7 @@ class TestingTools:
                 cmd.append(test_file)
             else:
                 cmd.append(target_path)
+            project_root=self.sandbox_path.parent
             
             # Run pytest
             result = subprocess.run(
@@ -77,7 +78,7 @@ class TestingTools:
             )
             
             # Parse output
-            test_results = self._parse_pytest_output(result.stdout, result.stderr)
+            test_results = self._parse_pytest_output(str(result.stdout), str(result.stderr))
             test_results['return_code'] = result.returncode
             test_results['success'] = result.returncode == 0
             test_results['status'] = 'success' if result.returncode == 0 else 'failed'

@@ -99,7 +99,7 @@ status="SUCCESS" )
   
 def judge_node(state:state_flow)->state_flow:
     current_code=fl.read_file(fl,state["file_path"])
-    judge_response=judge_agent.judge(current_code)
+    judge_response=judge_agent.judge(current_code,state["file_path"])
     test_path=f"""sandbox/{judge_response["test_file_name"]}"""
     fl.write_file(fl,test_path,judge_response["test_code"])
     pytest_output=ft.run_pytest(ft,".",test_path)
