@@ -90,6 +90,7 @@ details = {
 "output_response":fixer_response,
 },
 status="SUCCESS" )
+    print("backup,,,")
     backup_path= fl.backup_file(fl,state["file_path"])
     state["backup_path"]=backup_path
     fl.write_file(fl,state["file_path"],fixer_response["fixed_code"])
@@ -101,8 +102,9 @@ def judge_node(state:state_flow)->state_flow:
     current_code=fl.read_file(fl,state["file_path"])
     judge_response=judge_agent.judge(current_code,state["file_path"])
     test_path=f"""sandbox/{judge_response["test_file_name"]}"""
+    state["test_path"]=test_path
     fl.write_file(fl,test_path,judge_response["test_code"])
-    pytest_output=ft.run_pytest(ft,".",test_path)
+    pytest_output=ft.run_pytest(test_path)
     state["test_results"]=pytest_output
     return state
 def end_node(state):
@@ -111,6 +113,8 @@ def end_node(state):
 #////////////////////defining edges////////////
 
 from langgraph.graph import StateGraph,END
+from src.tools.file_tools import FileTools 
+fl=FileTools()
 def should_continue(state: state_flow) -> str:
     """
     Routing function: Decide whether to continue iterating or stop.
@@ -119,20 +123,24 @@ def should_continue(state: state_flow) -> str:
         "end": Stop the workflow (success or max iterations reached)
         "fixer": Loop back to fixer for another iteration
     """
-    # Success case: tests passed!
+    #  tests passed!
     if state["test_results"]["success"]:
+        
         print(f"SUCCESS: Tests passed! Stopping workflow.")
+        fl.delete_file(fl,state["backup_path"])
+        fl.delete_file(fl,state["test_path"])
         return "end"
     
-    # Failure case: reached max iterations
+    #  reached max iterations
     elif state["iteration"] >= state["max_iterations"]:
         print(f"Max iterations ({state['max_iterations']}) reached.")
         print(f"   Stopping workflow with failing tests.")
+        fl.restore_backup(fl,state["backup_path"],state["file_path"])
         return "end"
     
-    # Retry case: go back to fixer
+    # go back to fixer
     else:
-        print(f"Tests failed. Retrying ...")
+        print(f"Tests failed. retyr..")
         print(f"   Iteration {state['iteration']}/{state['max_iterations']}")
         return "fixer"
 

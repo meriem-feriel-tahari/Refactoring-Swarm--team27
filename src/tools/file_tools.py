@@ -156,10 +156,10 @@ class FileTools:
         
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_path = f"{file_path}.backup_{timestamp}"
+            backup_path = f"{file_path}.backup.py"
             
-            content = self.read_file(file_path)
-            if content and self.write_file(backup_path, content):
+            content = self.read_file(self,file_path)
+            if content and self.write_file(self,backup_path, content):
                 print(f" Backup created: {backup_path}")
                 return backup_path
             return None
