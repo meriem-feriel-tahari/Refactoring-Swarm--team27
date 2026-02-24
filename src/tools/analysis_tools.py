@@ -207,7 +207,7 @@ class AnalysisTools:
         results = {}
         python_files = []
         
-        print(f"📁 Analyzing directory: {directory}")
+        print(f" Analyzing directory: {directory}")
         
         # Find all Python files
         for file_path in Path(directory).rglob("*.py"):
@@ -279,7 +279,7 @@ class AnalysisTools:
             'files_analyzed': list(analysis_results.keys())
         }
         
-        print(f"\n📊 Analysis Summary:")
+        print(f"\n Analysis Summary:")
         print(f"   Files analyzed: {total_files}")
         print(f"   Average score: {avg_score:.2f}/10")
         print(f"   Total issues: {total_issues} (Errors: {total_errors}, Warnings: {total_warnings})")
@@ -311,7 +311,7 @@ class AnalysisTools:
             'improved': score_improvement > 0
         }
         
-        print(f"\n📈 Improvement Analysis:")
+        print(f"\n Improvement Analysis:")
         print(f"   Score: {before['score']:.2f} → {after['score']:.2f} ({'+' if score_improvement > 0 else ''}{score_improvement:.2f})")
         print(f"   Issues: {before['total_issues']} → {after['total_issues']} ({issues_reduced} reduced)")
         

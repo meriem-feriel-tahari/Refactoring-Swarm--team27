@@ -21,14 +21,11 @@ class JudgeAgent:
         The current code to test:\n{current_code}\n
         file name:{filename}
         """
-        # test_content=prompt["test_code"]
         
         
       
         response = self.llm.invoke(prompt)
-        print(f"//////////////judge output///////////////////////////// \n")
-        print(response.content)
-        print(f"/////////////////////////////////////////////////////// \n")
+       
 
         return json.loads(response.content)
        

@@ -140,7 +140,7 @@ def should_continue(state: state_flow) -> str:
     
     # go back to fixer
     else:
-        print(f"Tests failed. retyr..")
+        print(f"Tests failed. retry..")
         print(f"   Iteration {state['iteration']}/{state['max_iterations']}")
         return "fixer"
 

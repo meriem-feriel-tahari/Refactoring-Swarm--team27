@@ -41,11 +41,7 @@ PYTEST FAILURES:
            
                
        response = self.llm.invoke(prompt)
-    #    print(f"//////prompt/////\n")
-    #    print(prompt)
-       print(f"//////content////////////////////////////////////////\n")
-       print(response.content)
-       print(f"/////////////////////////////////////////////////////\n")
+ 
        return json.loads(response.content)
 
 

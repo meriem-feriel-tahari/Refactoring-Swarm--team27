@@ -10,7 +10,7 @@ class TestingTools:
     
     def __init__(self, sandbox_path: str = "./sandbox"):
         self.sandbox_path = Path(sandbox_path).resolve()
-        print("🧪 TestingTools initialized")
+        print(" TestingTools initialized")
 
     def run_pytest(self, test_target: str, timeout: int = 60, verbose: bool = True) -> Dict:
         cmd = [sys.executable, "-m", "pytest"]

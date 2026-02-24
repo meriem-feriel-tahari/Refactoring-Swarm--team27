@@ -95,7 +95,6 @@ class FileTools:
             raise SecurityError(f" Access denied: {file_path} is outside sandbox")
         
         try:
-            print(f"hello from write file \n")
             # Create parent directories if needed
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
             
@@ -203,13 +202,13 @@ class FileTools:
         try:
             if os.path.exists(file_path):
                 os.remove(file_path)
-                print(f"🗑️ Deleted: {file_path}")
+                print(f" Deleted: {file_path}")
                 return True
             else:
-                print(f"⚠️ File doesn't exist: {file_path}")
+                print(f" File doesn't exist: {file_path}")
                 return False
         except Exception as e:
-            print(f"❌ Error deleting file: {e}")
+            print(f"Error deleting file: {e}")
             return False
     
     def copy_file(self, source: str, destination: str) -> bool:
@@ -228,10 +227,10 @@ class FileTools:
         
         try:
             shutil.copy2(source, destination)
-            print(f"📋 Copied: {source} → {destination}")
+            print(f" Copied: {source} → {destination}")
             return True
         except Exception as e:
-            print(f"❌ Error copying file: {e}")
+            print(f" Error copying file: {e}")
             return False
     
     def get_file_info(self, file_path: str) -> Optional[Dict]:
@@ -245,7 +244,7 @@ class FileTools:
             Dictionary with file info or None
         """
         if not self._is_safe_path(file_path):
-            raise SecurityError(f"🚫 Access denied: {file_path} is outside sandbox")
+            raise SecurityError(f" Access denied: {file_path} is outside sandbox")
         
         try:
             if not os.path.exists(file_path):
@@ -262,7 +261,7 @@ class FileTools:
                 'extension': Path(file_path).suffix
             }
         except Exception as e:
-            print(f"❌ Error getting file info: {e}")
+            print(f" Error getting file info: {e}")
             return None
     
     def create_directory(self, dir_path: str) -> bool:
@@ -276,14 +275,14 @@ class FileTools:
             True if successful
         """
         if not self._is_safe_path(dir_path):
-            raise SecurityError(f"🚫 Access denied: {dir_path} is outside sandbox")
+            raise SecurityError(f" Access denied: {dir_path} is outside sandbox")
         
         try:
             Path(dir_path).mkdir(parents=True, exist_ok=True)
-            print(f"📁 Created directory: {dir_path}")
+            print(f" Created directory: {dir_path}")
             return True
         except Exception as e:
-            print(f"❌ Error creating directory: {e}")
+            print(f" Error creating directory: {e}")
             return False
     
     def get_sandbox_path(self) -> str:
